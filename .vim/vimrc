@@ -1,0 +1,242 @@
+" see ~/.config/nvim/init.vim for plugin install
+"
+let mapleader = ','
+
+" sets font for MacVim
+if has("gui_macvim")
+  set guifont=Inconsolata:h18
+endif
+
+" tell neovim where python lives
+let g:python3_host_prog='/usr/bin/python3'
+let g:python_host_prog='/usr/bin/python'
+
+" enable fzf for file picking
+set rtp+=/usr/bin/fzf
+
+" color in terminal and theme support
+set t_Co=256
+set colorcolumn=120
+set background=dark
+colo zenburn
+highlight Normal ctermbg=Black
+highlight NonText ctermbg=Black
+set cursorline
+
+
+" search
+
+set incsearch       " show the `best match so far' as strings are typed
+set nohlsearch      " don't highlight result
+set ignorecase      " case-sensitive only if has upper-case
+set smartcase
+set wrapscan        " wrap around the end of the file
+set gdefault        " assume the /g flag on by default
+
+" ,e and ,v open files in the same directory as current file
+cnoremap %% <C-R>=expand('%:h').'/'<cr>
+map <leader>e :edit %%
+map <leader>v :view %%
+
+
+" Allow project-specific .vimrc files
+" More: https://andrew.stwrt.ca/posts/project-specific-vimrc/
+set exrc
+
+
+" Kindasorta like emacs Alt-q (paragraph flow)
+" ,q ==> reformats paragraph
+map <leader>q gqj %%
+
+
+set nocompatible
+if has("autocmd")
+  filetype plugin indent on
+endif
+syntax on
+
+set vb t_vb=                            " Disable visual bell
+set autoread                            " Set to auto read when a file is changed from the outside
+set nobackup                            " Do not create backup files when saving over existing files
+set nowritebackup                       " A little paranoid, but disable the writebackup function as well
+set noswapfile                          " No swap files when editing please
+set number                              " Enable line numbers
+set numberwidth=3                       " Set line number column width
+set list                                " show trailing whiteshace and tabs
+set listchars=trail:~,tab:\|\           " Display tab (esp in Go) as |
+
+" use indents of 2 spaces, and have them copied down lines:
+set expandtab
+set tabstop=2
+set softtabstop=2
+set shiftwidth=2
+
+
+""""""""""""""""""""""""""""""""""""""""
+" WindowAndBufferManagement
+
+set splitbelow                          " Open new horizontal split windows below current
+set splitright                          " Open new vertical split windows to the right
+set switchbuf=useopen,usetab,split      " Don't change my current buffer on quickfix
+
+" move back and forth through open buffers
+" Practical Vim, p. 85 (also from vim-unimpaired)
+nnoremap <silent> [b :bprevious<CR>
+nnoremap <silent> ]b :bnext<CR>
+nnoremap <silent> [B :bfirst<CR>
+nnoremap <silent> ]B :blast<CR>
+
+" shortcuts for fzf -- see Vim After 15 Years, https://statico.github.io/vim3.html
+"
+" navigate among buffers
+nmap ; :Buffers<CR>
+
+" navigate among files
+nmap <Leader>t :Files<CR>
+" nmap <Leader>r :Tags<CR>
+
+" StatusBar
+
+" Always show status bar
+set laststatus=2
+
+" from: https://github.com/w0rp/ale#faq-statusline
+function! LinterStatus() abort
+    let l:counts = ale#statusline#Count(bufnr(''))
+
+    let l:all_errors = l:counts.error + l:counts.style_error
+    let l:all_non_errors = l:counts.total - l:all_errors
+
+    return l:counts.total == 0 ? 'OK ' : printf(
+    \   '%dW %dE',
+    \   all_non_errors,
+    \   all_errors
+    \)
+endfunction
+
+
+set statusline=\ "
+set statusline+=%f\                       " file name
+set statusline+=[
+set statusline+=%{strlen(&ft)?&ft:'none'} " filetype
+set statusline+=]
+set statusline+=%h%1*%m%r%w%0*            " flag
+set statusline+=\ "
+set statusline+=%{fugitive#statusline()}  " git
+set statusline+=\ "
+set statusline+=%=                        " right align
+set statusline+=%#warningmsg#
+set statusline+=%{LinterStatus()}         " ALE linting status (above)
+set statusline+=%*
+set statusline+=%-14.(%l,%c%V%)\ %<%P     " offset
+
+
+""""""""""""""""""""""""""""""""""""""""
+" ALE configuration
+
+let g:ale_lint_on_text_changed = 'always' " default: 'always'; 'never' for only on save
+let g:ale_lint_on_save = 1                " default: 1
+let g:ale_lint_on_enter = 1               " default: 1
+let g:ale_lint_on_filetype_changed = 1    " default: 1
+let g:ale_sign_column_always = 1          " default: 1
+
+nmap <silent> <Leader>ak :ALEPrevious<CR>
+nmap <silent> <Leader>aj :ALENext<CR>
+
+" Error and warning signs.
+let g:ale_sign_error = '⤫'
+let g:ale_sign_warning = '⚠'
+
+""""""""""""""""""""""""""""""""""""""""
+" Completion (deoplete)
+"
+let g:deoplete#enable_at_startup = 1
+
+
+
+""""""""""""""""""""""""""""""""""""""""
+" grepper configurtion
+
+let g:grepper = {}
+let g:grepper.tools = ['grep', 'git', 'rg']
+let g:grepper.rg = {}
+
+" -H:           with filename
+" --no-heading: don't group matches by file
+let g:grepper.rg.grepprg = 'rg -H --no-heading --vimgrep'
+
+" %f: file; %l: line; %c: column; %m: message
+let g:grepper.rg.grepformat = '%f:%l:%c:%m'
+
+" Search for the current word
+nnoremap <Leader>* :Grepper -cword -noprompt<CR>
+
+" Search for the current selection
+nmap gs <plug>(GrepperOperator)
+xmap gs <plug>(GrepperOperator)
+
+" ,g ==> run grep with ripgrep
+nnoremap <Leader>g :Grepper -tool rg<CR>
+
+""""""""""""""""""""""""""""""""""""""""
+" vim-test
+
+" nmap <silent> <leader>a :TestSuite<CR>
+
+
+""""""""""""""""""""""""""""""""""""""""
+" vim-go
+"
+" Sources:
+"   https://hackernoon.com/my-neovim-setup-for-go-7f7b6e805876
+
+au FileType go set noexpandtab
+au FileType go set shiftwidth=4
+au FileType go set softtabstop=4
+au FileType go set tabstop=4
+
+let g:go_highlight_build_constraints = 1
+let g:go_highlight_extra_types = 1
+let g:go_highlight_fields = 1
+let g:go_highlight_functions = 1
+let g:go_highlight_methods = 1
+let g:go_highlight_operators = 1
+let g:go_highlight_structs = 1
+let g:go_highlight_types = 1
+
+" highlight instances of the same variable elsewhere in the buffer
+let g:go_auto_sameids = 1
+
+" run this when we save
+let g:go_fmt_command = "goimports"
+
+" show type info in bottom
+let g:go_auto_type_info = 1
+
+" K when on item shows godocs
+
+" Go to definition of item under cursor
+au FileType go nmap <F12> <Plug>(go-def)
+
+" When on struct use :GoAddTags to generate them, this controls
+" whether to use camelCase or snake_case
+
+let g:go_addtags_transform = "snakecase"
+
+
+""""""""""""""""""""""""""""""""""""""""
+" grab bag
+
+" pretty self-explanatory :-)
+let g:sql_type_default = 'postgresql'
+
+" ,<space> ==> remote spaces from end of line
+nmap <silent> <leader><space> :call TrimSpaces()<CR>
+function! TrimSpaces()
+  %s/\s*$//
+  ''
+endfunction
+
+" With exrc above (also see link there), ensure that :autocmd/shell/write commands in
+" .vimrc are only run if the files are owned by me
+set secure

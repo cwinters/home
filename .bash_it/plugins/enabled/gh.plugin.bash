@@ -1,0 +1,1 @@
+../available/gh.plugin.bash

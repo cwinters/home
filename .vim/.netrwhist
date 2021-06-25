@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =4
+let g:netrw_dirhist_4='/home/cwinters/projects/github/cwinters.github.io/now'
+let g:netrw_dirhist_3='/usr/lib/python3/dist-packages/requests'
+let g:netrw_dirhist_2='/Users/cwinters/Turnitin/turnitin/draft-coach-provisioning/test-reports'
+let g:netrw_dirhist_1='/Users/cwinters/Turnitin/revisionassistant/adm-internal'
+let g:netrw_dirhist_0='/Users/cwinters/Turnitin/turnitin/draft-coach-provisioning/dcp/__pycache__'
+let g:netrw_dirhist_9='/Users/cwinters/Turnitin/commons/python-util'
+let g:netrw_dirhist_8='/Users/cwinters/Turnitin/revisionassistant/svc-predict/lambda/start-worker-for-rubric'
+let g:netrw_dirhist_7='/Users/cwinters/Turnitin/appops/jar-uploader'
+let g:netrw_dirhist_6='/Users/cwinters/Turnitin/revisionassistant/api-edge/api/resource_links'
+let g:netrw_dirhist_5='/Users/cwinters/Turnitin/revisionassistant/ra-data-scripts/proofread'
